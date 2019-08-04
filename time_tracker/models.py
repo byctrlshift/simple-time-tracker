@@ -54,7 +54,7 @@ class Task(models.Model):
     priority = models.CharField(max_length=1, choices=PRIORITY_TYPE, default='N')
     hours = models.FloatField()
     implementer = models.ForeignKey(Developer, null=True, on_delete=models.SET_NULL, related_name='task_implementer')
-    creator = models.ForeignKey(Developer, null=True, on_delete=models.SET_NULL, related_name='task_creator')
+    creator = models.ForeignKey(User, null=True, on_delete=models.SET_NULL, related_name='task_creator')
     project = models.ForeignKey(Project, null=True, on_delete=models.SET_NULL)
 
     def __str__(self):

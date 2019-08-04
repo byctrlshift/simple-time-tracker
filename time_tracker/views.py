@@ -112,6 +112,6 @@ def create_task(request, slug):
             form.save()
             return redirect('tracker-home')
     else:
-        form = CreateTaskForm(initial={'project': project})
+        form = CreateTaskForm(initial={'project': project, 'creator': request.user})
 
     return render(request, 'tracker/create_task.html', {'form': form, 'project': project})
