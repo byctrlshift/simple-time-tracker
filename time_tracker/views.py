@@ -26,9 +26,9 @@ def tracker_home(request):
     if request.user.is_superuser:
         projects = Project.objects.all()
     else:
-        user = Developer.objects.get(user__username=request.user)
-        projects_id = Task.objects.filter(implementer=user).values_list('id', flat=True)
-        projects = Project.objects.filter(id__in=projects_id)
+        dev = Developer.objects.get(user__username=request.user.username)
+        projects_id = Task.objects.filter(implementer=dev).all()
+        projects = Project.objects.filter(pk__in=[x.project.pk for x in projects_id])
 
     return render(request, 'tracker/tracker_home.html', {'projects': projects})
 
