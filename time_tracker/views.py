@@ -52,21 +52,25 @@ def task_info(request, slug, task_id):
     task = Task.objects.get(id=task_id)
     time = Log.objects.filter(task_id=task_id)
     comments = Comment.objects.filter(task_id=task_id).order_by('-createdAt')
+    spent_time = 0
+    for t in time:
+        spent_time += t.hours
 
     if request.POST:
-        f_time = AddTimeToTaskForm(request.POST or None)
-        f_comment = AddCommentToTaskForm(request.POST or None)
+        f_time = AddTimeToTaskForm(request.POST, prefix='time')
+        f_comment = AddCommentToTaskForm(request.POST, prefix='comment')
         if f_time.is_valid():
             f_time.save()
-        elif f_comment.is_valid():
+        if f_comment.is_valid():
             f_comment.save()
 
         return redirect('task-info', slug=slug, task_id=task_id)
     else:
         f_time = AddTimeToTaskForm(initial={'task': task}, prefix='time')
-        f_comment = AddCommentToTaskForm(initial={'task': task}, prefix='comment')
+        f_comment = AddCommentToTaskForm(
+            initial={'task': task, 'author': Developer.objects.get(user=request.user)}, prefix='comment')
 
-    args = {'project': project, 'task': task, 'f_time': f_time,
+    args = {'project': project, 'task': task, 'f_time': f_time, 'spent_time': spent_time,
             'f_comment': f_comment, 'time_list': time, 'comments': comments}
 
     return render(request, 'tracker/task_info.html', args)

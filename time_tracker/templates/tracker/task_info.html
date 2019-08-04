@@ -47,11 +47,11 @@
                         {% endfor %}
                         {% render_field f_time.task hidden=hidden %}
                         <div class="form-group">
-                            <label for="{{ form.hours.id_for_label }}">Hours</label>
+                            <label for="{{ f_time.hours.id_for_label }}">Hours</label>
                             {{ f_time.hours|add_class:"form-control" }}
                         </div>
                         <div class="form-group">
-                            <label for="{{ form.comment.id_for_label }}">Comment</label>
+                            <label for="{{ f_time.comment.id_for_label }}">Comment</label>
                             {{ f_time.comment|add_class:"form-control"|attr:"rows: 3" }}
                         </div>
                         <button class="btn btn-primary btn-lg btn-block" type="submit">Add</button>
@@ -69,6 +69,7 @@
             </div>
         </div>
         <div class="col-md-6">
+            <h5 class="card-title">Description</h5>
             <div class="alert alert-info" role="alert" style="text-align: justify;">
                 {{ task.description|safe }}
             </div>
@@ -95,8 +96,9 @@
                             {{ hidden_field }}
                         {% endfor %}
                         {% render_field f_comment.task hidden=hidden %}
+                        {% render_field f_comment.author hidden=hidden %}
                         <div class="form-group">
-                            <label for="{{ form.comment.id_for_label }}">Comment</label>
+                            <label for="{{ f_comment.comment.id_for_label }}">Comment</label>
                             {{ f_comment.comment|add_class:"form-control"|attr:"rows: 5" }}
                         </div>
                         <button class="btn btn-primary btn-lg btn-block" type="submit">Add comment</button>
@@ -109,22 +111,25 @@
                                 <small>{{ comment.createdAt|date:"d-m-Y" }} {{ comment.createdAt|time:"H:i" }}</small>
                             </div>
                             <p class="mb-1">{{ comment.comment|safe }}</p>
+                            <small>Author: <b>{{ comment.author.user.username }}</b></small>
                         </a>
                     {% endfor %}
                 </div>
             </div>
         </div>
         <div class="col-md-3">
+            <h5 class="card-title">Spent time: {{ spent_time }} hours</h5>
             <div class="list-group" style="padding-bottom: 1rem;">
                 <a href="#" class="list-group-item list-group-item-action">
                     <div class="d-flex w-100 justify-content-between">
-                        <small>{{ task.date_start|date:"d-m-Y" }} to {{ task.date_stop|date:"d-m-Y" }}</small>
+                        <small>{{ task.date_start|date:"d-m-Y" }} to {{ task.date_stop|date:"d-m-Y" }}<br>
+                            Hours: {{ task.hours }}</small>
                     </div>
                     <br>
                     <small>Type: <b>{{ task.get_kind_display }}</b> Priority:
                         <b>{{ task.get_priority_display }}</b></small><br>
                     <small>Creator: <b>{{ task.creator }}</b> Implementor:
-                        <b>{{ task.implementer.user }}</b></small>
+                        <b>{{ task.implementer.user }}</b></small> <br>
                 </a>
             </div>
             <a href="{% url 'task-edit' slug=project.slug task_id=task.id %}"

@@ -16,6 +16,7 @@ class Developer(models.Model):
         on_delete=models.SET_NULL
     )
     birth_date = models.DateField(null=True, blank=True)
+    position = models.CharField(max_length=128, blank=True)
     avatar = models.FileField(upload_to=get_image_path, blank=True)
 
     def __str__(self):
@@ -47,7 +48,7 @@ class Task(models.Model):
         ('B', 'Bug'),
     )
     subject = models.CharField(max_length=128)
-    description = tinymce_models.HTMLField()
+    description = models.TextField()
     date_start = models.DateField()
     date_stop = models.DateField()
     kind = models.CharField(max_length=1, choices=TASK_TYPE, default='F')
@@ -62,9 +63,9 @@ class Task(models.Model):
 
 
 class Comment(models.Model):
-    comment = tinymce_models.HTMLField()
+    comment = models.TextField()
     createdAt = models.DateTimeField(auto_now_add=True, null=True)
-    author = models.OneToOneField(Developer, null=True, on_delete=models.SET_NULL, related_name='comment_author')
+    author = models.ForeignKey(Developer, null=True, on_delete=models.SET_NULL)
     task = models.ForeignKey(Task, null=True, on_delete=models.SET_NULL)
 
 
