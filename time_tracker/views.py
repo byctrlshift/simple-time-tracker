@@ -1,8 +1,21 @@
 from pprint import pprint
 from django.shortcuts import render, redirect
+from django.template.loader import get_template
+from django.core.mail import EmailMultiAlternatives
 from django.contrib.auth.decorators import user_passes_test
 from time_tracker.models import Project, Task, Log, Developer, Comment
 from time_tracker.forms import CreateTaskForm, EditTaskForm, AddTimeToTaskForm, AddCommentToTaskForm, ProjectForm
+
+
+def task_send_message(old, new):
+    html = get_template('email.html')
+    d = {'old': old, 'new': new}
+
+    subject, from_email, to = 'hello', 'from@example.com', 'to@example.com'
+    html_content = html.render(d)
+    msg = EmailMultiAlternatives(subject, "text_content", from_email, [to])
+    msg.attach_alternative(html_content, "text/html")
+    msg.send()
 
 
 def home(request):
@@ -66,8 +79,8 @@ def edit_task(request, slug, task_id):
     if request.POST:
         form = EditTaskForm(request.POST, instance=task)
         if form.is_valid():
-            pprint(form.cleaned_data)
-            form.save()
+            new = form.save()
+            task_send_message(task, new)
             return redirect('task-info', slug=slug, task_id=task_id)
     else:
         form = EditTaskForm(instance=task)

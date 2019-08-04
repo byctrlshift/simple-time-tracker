@@ -1,0 +1,70 @@
+<div class="container">
+    <div class="alert alert-warning" role="alert" style="text-align: justify;">
+        OLD
+    </div>
+    <div class="jumbotron">
+        <h1 class="display-4">Hello, it is OLD {{ old.subject }} <b>task</b>!</h1>
+        <hr class="my-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'tracker-home' %}">Home</a></li>
+                <li class="breadcrumb-item"><a
+                        href="{% url 'project-info' slug=old.project.slug %}">Project {{ old.project.name }}</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Task {{ old.subject }}</li>
+            </ol>
+        </nav>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="alert alert-info" role="alert" style="text-align: justify;">
+                {{ old.description|safe }}
+            </div>
+            <div class="list-group" style="padding-bottom: 1rem;">
+                <a href="#" class="list-group-item list-group-item-action">
+                    <div class="d-flex w-100 justify-content-between">
+                        <small>{{ old.date_start|date:"d-m-Y" }} to {{ old.date_stop|date:"d-m-Y" }}</small>
+                    </div>
+                    <br>
+                    <small>Type: <b>{{ old.get_kind_display }}</b> Priority:
+                        <b>{{ old.get_priority_display }}</b></small><br>
+                    <small>Creator: <b>{{ old.creator }}</b> Implementor:
+                        <b>{{ old.implementer.user.username }}</b></small>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="alert alert-warning" role="alert" style="text-align: justify;">
+        NEW
+    </div>
+    <div class="jumbotron">
+        <h1 class="display-4">Hello, it is NEW {{ new.subject }} <b>task</b>!</h1>
+        <hr class="my-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'tracker-home' %}">Home</a></li>
+                <li class="breadcrumb-item"><a
+                        href="{% url 'project-info' slug=new.project.slug %}">Project {{ new.project.name }}</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Task {{ new.subject }}</li>
+            </ol>
+        </nav>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="alert alert-info" role="alert" style="text-align: justify;">
+                {{ new.description|safe }}
+            </div>
+            <div class="list-group" style="padding-bottom: 1rem;">
+                <a href="#" class="list-group-item list-group-item-action">
+                    <div class="d-flex w-100 justify-content-between">
+                        <small>{{ new.date_start|date:"d-m-Y" }} to {{ new.date_stop|date:"d-m-Y" }}</small>
+                    </div>
+                    <br>
+                    <small>Type: <b>{{ new.get_kind_display }}</b> Priority:
+                        <b>{{ new.get_priority_display }}</b></small><br>
+                    <small>Creator: <b>{{ new.creator }}</b> Implementor:
+                        <b>{{ new.implementer.user.username }}</b></small>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

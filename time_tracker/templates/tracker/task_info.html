@@ -123,8 +123,8 @@
                     <br>
                     <small>Type: <b>{{ task.get_kind_display }}</b> Priority:
                         <b>{{ task.get_priority_display }}</b></small><br>
-                    <small>Creator: <b>{{ task.creator.user.username }}</b> Implementor:
-                        <b>{{ task.implementer.user.username }}</b></small>
+                    <small>Creator: <b>{{ task.creator }}</b> Implementor:
+                        <b>{{ task.implementer.user }}</b></small>
                 </a>
             </div>
             <a href="{% url 'task-edit' slug=project.slug task_id=task.id %}"
