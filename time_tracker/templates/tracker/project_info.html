@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ project.name }}{% endblock %}
+
+{% block content %}
+    <div class="jumbotron">
+        <h1 class="display-4">Hello, it is {{ project.name }} <b>project</b>!</h1>
+        <p class="lead">{{ project.description|safe }}</p>
+        <hr class="my-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'tracker-home' %}">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Project {{ project.name }}</li>
+            </ol>
+        </nav>
+    </div>
+    <div class="row">
+        <div class="col-md-9">
+            <div class="list-group">
+                {% for task in tasks %}
+                    <a href="{% url 'task-info' slug=project.slug task_id=task.id %}" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">{{ task.subject }}</h5>
+                            <small>From {{ task.date_start|date:'Y-m-d'}} to {{ task.date_stop|date:'Y-m-d' }} <br> Hours: {{ task.hours }}</small>
+                        </div>
+                        <p class="mb-1">{{ task.description|truncatechars:16|safe }}</p>
+                        <small>Type: <b>{{ task.get_kind_display }}</b> Priority: <b>{{ task.get_priority_display }}</b></small><br>
+                        <small>Creator: <b>{{ task.creator.user.username }}</b> Implementor: <b>{{ task.implementer.user.username }}</b></small>
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-md-3">
+            {% if user.is_superuser %}
+                <a href="{% url 'project-edit' slug=project.slug %}" class="btn btn-primary btn-lg btn-block">Edit project</a>
+                <a href="{% url 'task-create' slug=project.slug %}" class="btn btn-primary btn-lg btn-block">Add Task</a>
+            {% endif %}
+            <br>
+            <div class="card" style="width: 18rem;">
+                <div class="card-body">
+                    <h5 class="card-title">Spent time for all tasks</h5>
+                    <p class="card-text"> Now: {{ hours }} hours</p>
+                    <p class="card-text"> Preliminarily: {{ caclTime }} hours</p>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}{{ task.subject }}{% endblock %}
+{% block add_to_head %}
+    <script type="text/javascript" src="{% static "tiny_mce/tiny_mce.js" %}"></script>
+    {{ f_comment.media }}
+{% endblock %}
+
+{% block content %}
+    <div class="jumbotron">
+        <h1 class="display-4">Hello, it is {{ task.subject }} <b>task</b>!</h1>
+        <hr class="my-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'tracker-home' %}">Home</a></li>
+                <li class="breadcrumb-item"><a
+                        href="{% url 'project-info' slug=task.project.slug %}">Project {{ task.project.name }}</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Task {{ task.subject }}</li>
+            </ol>
+        </nav>
+    </div>
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Add time</h5>
+                    {% if f_time.errors %}
+                        {% for field in f_time %}
+                            {% for error in field.errors %}
+                                <div class="alert alert-danger">
+                                    <strong>{{ error|escape }}</strong>
+                                </div>
+                            {% endfor %}
+                        {% endfor %}
+                        {% for error in f_time.non_field_errors %}
+                            <div class="alert alert-danger">
+                                <strong>{{ error|escape }}</strong>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    <form method="post">
+                        {% csrf_token %}
+                        {% for hidden_field in f_time.hidden_fields %}
+                            {{ hidden_field }}
+                        {% endfor %}
+                        {% render_field f_time.task hidden=hidden %}
+                        <div class="form-group">
+                            <label for="{{ form.hours.id_for_label }}">Hours</label>
+                            {{ f_time.hours|add_class:"form-control" }}
+                        </div>
+                        <div class="form-group">
+                            <label for="{{ form.comment.id_for_label }}">Comment</label>
+                            {{ f_time.comment|add_class:"form-control"|attr:"rows: 3" }}
+                        </div>
+                        <button class="btn btn-primary btn-lg btn-block" type="submit">Add</button>
+                    </form>
+                    <br>
+                    <ul class="list-group">
+                        {% for time in time_list %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ time.comment }}
+                                <span class="badge badge-primary badge-pill">{{ time.hours }} h</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="alert alert-info" role="alert" style="text-align: justify;">
+                {{ task.description|safe }}
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Comments</h5>
+                    {% if f_comment.errors %}
+                        {% for field in f_comment %}
+                            {% for error in field.errors %}
+                                <div class="alert alert-danger">
+                                    <strong>{{ error|escape }}</strong>
+                                </div>
+                            {% endfor %}
+                        {% endfor %}
+                        {% for error in f_comment.non_field_errors %}
+                            <div class="alert alert-danger">
+                                <strong>{{ error|escape }}</strong>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    <form method="post">
+                        {% csrf_token %}
+                        {% for hidden_field in f_comment.hidden_fields %}
+                            {{ hidden_field }}
+                        {% endfor %}
+                        {% render_field f_comment.task hidden=hidden %}
+                        <div class="form-group">
+                            <label for="{{ form.comment.id_for_label }}">Comment</label>
+                            {{ f_comment.comment|add_class:"form-control"|attr:"rows: 5" }}
+                        </div>
+                        <button class="btn btn-primary btn-lg btn-block" type="submit">Add comment</button>
+                    </form>
+                </div>
+                <div class="list-group" style="padding: 1rem;">
+                    {% for comment in comments %}
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <small>{{ comment.createdAt|date:"d-m-Y" }} {{ comment.createdAt|time:"H:i" }}</small>
+                            </div>
+                            <p class="mb-1">{{ comment.comment|safe }}</p>
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="list-group" style="padding-bottom: 1rem;">
+                <a href="#" class="list-group-item list-group-item-action">
+                    <div class="d-flex w-100 justify-content-between">
+                        <small>{{ task.date_start|date:"d-m-Y" }} to {{ task.date_stop|date:"d-m-Y" }}</small>
+                    </div>
+                    <br>
+                    <small>Type: <b>{{ task.get_kind_display }}</b> Priority:
+                        <b>{{ task.get_priority_display }}</b></small><br>
+                    <small>Creator: <b>{{ task.creator.user.username }}</b> Implementor:
+                        <b>{{ task.implementer.user.username }}</b></small>
+                </a>
+            </div>
+            <a href="{% url 'task-edit' slug=project.slug task_id=task.id %}"
+               class="btn btn-primary btn-lg btn-block">Edit
+                Task</a>
+        </div>
+    </div>
+{% endblock %}

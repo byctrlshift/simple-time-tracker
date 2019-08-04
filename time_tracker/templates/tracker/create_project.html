@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% load static %}
+
+{% block title %}Create project{% endblock %}
+{% block add_to_head %}
+    <script type="text/javascript" src="{% static "tiny_mce/tiny_mce.js" %}"></script>
+    {{ form.media }}
+{% endblock %}
+
+{% block content %}
+    <div class="py-5 text-center">
+        <h2>Create project</h2>
+    </div>
+    {% if form.errors %}
+        {% for field in form %}
+            {% for error in field.errors %}
+                <div class="alert alert-danger">
+                    <strong>{{ error|escape }}</strong>
+                </div>
+            {% endfor %}
+        {% endfor %}
+        {% for error in form.non_field_errors %}
+            <div class="alert alert-danger">
+                <strong>{{ error|escape }}</strong>
+            </div>
+        {% endfor %}
+    {% endif %}
+    <div class="row">
+        <div class="col-md-12">
+            <form method="post">
+                {% csrf_token %}
+                {% for hidden_field in form.hidden_fields %}
+                    {{ hidden_field }}
+                {% endfor %}
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="{{ form.name.id_for_label }}">Name</label>
+                        {{ form.name|add_class:"form-control" }}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="{{ form.description.id_for_label }}">Description</label>
+                    {{ form.description|add_class:"form-control"|attr:"rows: 5" }}
+                </div>
+                <button class="btn btn-primary btn-lg btn-block" type="submit">Create</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

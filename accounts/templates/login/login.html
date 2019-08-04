@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{% block title %}Sign In{% endblock %}
+{% block body %}
+    <div class="page-sign sign-in">
+        <div class="container-sign">
+            <div class="card">
+                <div class="card-header">
+                    {% if login_error %}
+                        <div class="callout callout-danger">
+                            <h5>Error</h5>
+                            <p>{{ login_error }}</p>
+                        </div>
+                    {% endif %}
+                    <h1>Welcome!</h1>
+                    <span>Sign in to your account</span>
+                </div>
+                <div class="card-body">
+                    <form action="{% url 'accounts:log-in' %}" method="post">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label>Username</label>
+                            <input type="text" name="username" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label class="d-flex">
+                                <div>Password</div>
+                            </label>
+                            <input type="password" name="password" class="form-control">
+                        </div>
+                        <div class="form-group d-flex">
+                            <button type="submit" class="btn btn-primary ml-auto">Sign in</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
