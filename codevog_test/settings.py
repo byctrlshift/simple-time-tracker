@@ -139,6 +139,10 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+STATICFILES_DIRS = [
+    'time_tracker/static',
+]
+
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
@@ -152,6 +156,7 @@ TINYMCE_DEFAULT_CONFIG = {
     # 'valid_styles': 'font-weight,font-style,text-decoration',
     'custom_undo_redo_levels': 10,
 }
+
 
 TINYMCE_SPELLCHECKER = True
 TINYMCE_COMPRESSOR = True
