@@ -15,11 +15,13 @@ from time_tracker.forms import CreateTaskForm, EditTaskForm, AddTimeToTaskForm, 
 @receiver(pre_save, sender=Task)
 def task_send_message(instance, sender, **kwargs):
     html = get_template('email.html')
-    d = {'old': Task.objects.get(pk=instance.pk), 'new': instance}
+    old = Task.objects.get(pk=instance.pk)
+    d = {'old': old, 'new': instance}
 
-    subject, from_email, to = 'hello', 'from@example.com', 'to@example.com'
+    subject, from_email, to = 'Changed task', settings.EMAIL_HOST_USER, [old.creator.email, old.implementer.user.email,
+                                                                  instance.implementer.user.email]
     html_content = html.render(d)
-    msg = EmailMultiAlternatives(subject, "text_content", from_email, [to])
+    msg = EmailMultiAlternatives(subject, "text_content", from_email, to)
     msg.attach_alternative(html_content, "text/html")
     msg.send()
 
