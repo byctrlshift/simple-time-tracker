@@ -129,8 +129,8 @@ def edit_project(request, slug):
     if request.POST:
         form = ProjectForm(request.POST, instance=project)
         if form.is_valid():
-            form.save()
-            return redirect('project-info', slug=slug)
+            new = form.save()
+            return redirect('project-info', slug=new.slug)
     else:
         form = ProjectForm(instance=project)
 
