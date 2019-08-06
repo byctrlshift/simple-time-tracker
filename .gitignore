@@ -3,6 +3,7 @@
 .DS_Store
 .idea
 */migrations
+static
 
 __pycache__/
 *.py[cod]
@@ -127,3 +128,4 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+/static/

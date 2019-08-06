@@ -1,0 +1,1 @@
+web: gunicorn codevog_test.wsgi --log-file -
