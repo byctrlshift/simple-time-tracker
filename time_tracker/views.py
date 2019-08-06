@@ -1,4 +1,8 @@
 from pprint import pprint
+from django.conf import settings
+from django.dispatch import receiver
+from django.core.mail import send_mail
+from django.db.models.signals import pre_save
 from django.shortcuts import render, redirect
 from django.template.loader import get_template
 from django.core.mail import EmailMultiAlternatives
@@ -7,9 +11,10 @@ from time_tracker.models import Project, Task, Log, Developer, Comment
 from time_tracker.forms import CreateTaskForm, EditTaskForm, AddTimeToTaskForm, AddCommentToTaskForm, ProjectForm
 
 
-def task_send_message(old, new):
+@receiver(pre_save, sender=Task)
+def task_send_message(instance, sender):
     html = get_template('email.html')
-    d = {'old': old, 'new': new}
+    d = {'old': Task.objects.get(pk=instance.pk), 'new': instance}
 
     subject, from_email, to = 'hello', 'from@example.com', 'to@example.com'
     html_content = html.render(d)
@@ -84,7 +89,7 @@ def edit_task(request, slug, task_id):
         form = EditTaskForm(request.POST, instance=task)
         if form.is_valid():
             new = form.save()
-            task_send_message(task, new)
+            # task_send_message(task, new)
             return redirect('task-info', slug=slug, task_id=task_id)
     else:
         form = EditTaskForm(instance=task)
