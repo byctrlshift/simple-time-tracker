@@ -14,7 +14,7 @@ from time_tracker.forms import CreateTaskForm, EditTaskForm, AddTimeToTaskForm, 
 
 @receiver(pre_save, sender=Task)
 def task_send_message(instance, sender, **kwargs):
-    html = get_template('email.html')
+    html = get_template('email/email.html')
     old = Task.objects.get(pk=instance.pk)
     d = {'old': old, 'new': instance}
 
@@ -52,7 +52,7 @@ def project_info(request, slug):
             time += float(l.hours)
 
     args = {'project': project, 'tasks': tasks, 'hours': time, 'caclTime': calc_time}
-    return render(request, 'tracker/project_info.html', args)
+    return render(request, 'tracker/project/project_info.html', args)
 
 
 def task_info(request, slug, task_id):
@@ -81,7 +81,7 @@ def task_info(request, slug, task_id):
     args = {'project': project, 'task': task, 'f_time': f_time, 'spent_time': spent_time,
             'f_comment': f_comment, 'time_list': time, 'comments': comments}
 
-    return render(request, 'tracker/task_info.html', args)
+    return render(request, 'tracker/task/task_info.html', args)
 
 
 def edit_task(request, slug, task_id):
@@ -98,7 +98,7 @@ def edit_task(request, slug, task_id):
         form = EditTaskForm(instance=task)
 
     args = {'form': form, 'project': project, 'task': task}
-    return render(request, 'tracker/edit_task_info.html', args)
+    return render(request, 'tracker/task/edit_task_info.html', args)
 
 
 @user_passes_test(lambda u: u.is_superuser, login_url='/')
@@ -111,7 +111,7 @@ def create_project(request):
     else:
         form = ProjectForm()
 
-    return render(request, 'tracker/create_project.html', {'form': form})
+    return render(request, 'tracker/project/create_project.html', {'form': form})
 
 
 @user_passes_test(lambda u: u.is_superuser, login_url='/')
@@ -125,7 +125,7 @@ def edit_project(request, slug):
     else:
         form = ProjectForm(instance=project)
 
-    return render(request, 'tracker/edit_project.html', {'form': form})
+    return render(request, 'tracker/project/edit_project.html', {'form': form})
 
 
 @user_passes_test(lambda u: u.is_superuser, login_url='/')
@@ -139,4 +139,4 @@ def create_task(request, slug):
     else:
         form = CreateTaskForm(initial={'project': project, 'creator': request.user})
 
-    return render(request, 'tracker/create_task.html', {'form': form, 'project': project})
+    return render(request, 'tracker/task/create_task.html', {'form': form, 'project': project})
