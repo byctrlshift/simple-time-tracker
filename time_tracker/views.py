@@ -32,7 +32,6 @@ def home(request):
     return render(request, 'index.html')
 
 
-@user_passes_test(lambda u: u.is_superuser, login_url='/')
 def time_log_list(request):
     logs = Log.objects.all()
 
