@@ -65,7 +65,7 @@ class Task(models.Model):
 class Comment(models.Model):
     comment = models.TextField()
     createdAt = models.DateTimeField(auto_now_add=True, null=True)
-    author = models.ForeignKey(Developer, null=True, on_delete=models.SET_NULL)
+    author = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
     task = models.ForeignKey(Task, null=True, on_delete=models.SET_NULL)
 
 

@@ -73,11 +73,8 @@ def task_info(request, slug, task_id):
         return redirect('task-info', slug=slug, task_id=task_id)
     else:
         f_time = AddTimeToTaskForm(initial={'task': task}, prefix='time')
-        pprint(Developer.objects.get(user__username=request.user))
-        pprint(User.objects.get(username=request.user))
-        author = Developer.objects.get(user=request.user) or User.objects.get(user=request.user)
         f_comment = AddCommentToTaskForm(
-            initial={'task': task, 'author': author}, prefix='comment')
+            initial={'task': task, 'author': User.objects.get(username=request.user)}, prefix='comment')
 
     args = {'project': project, 'task': task, 'f_time': f_time, 'spent_time': spent_time,
             'f_comment': f_comment, 'time_list': time, 'comments': comments}
