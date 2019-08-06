@@ -1,5 +1,6 @@
 from pprint import pprint
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.dispatch import receiver
 from django.core.mail import send_mail
 from django.db.models.signals import pre_save
@@ -11,17 +12,17 @@ from time_tracker.models import Project, Task, Log, Developer, Comment
 from time_tracker.forms import CreateTaskForm, EditTaskForm, AddTimeToTaskForm, AddCommentToTaskForm, ProjectForm
 
 
-@receiver(pre_save, sender=Task)
-def task_send_message(instance, sender):
-    html = get_template('email.html')
-    d = {'old': Task.objects.get(pk=instance.pk), 'new': instance}
-
-    subject, from_email, to = 'hello', 'from@example.com', 'to@example.com'
-    html_content = html.render(d)
-    msg = EmailMultiAlternatives(subject, "text_content", from_email, [to])
-    msg.attach_alternative(html_content, "text/html")
-    msg.send()
-
+# @receiver(pre_save, sender=Task)
+# def task_send_message(instance, sender):
+#     html = get_template('email.html')
+#     d = {'old': Task.objects.get(pk=instance.pk), 'new': instance}
+#
+#     subject, from_email, to = 'hello', 'from@example.com', 'to@example.com'
+#     html_content = html.render(d)
+#     msg = EmailMultiAlternatives(subject, "text_content", from_email, [to])
+#     msg.attach_alternative(html_content, "text/html")
+#     msg.send()
+#
 
 def home(request):
     return render(request, 'index.html')
@@ -72,8 +73,11 @@ def task_info(request, slug, task_id):
         return redirect('task-info', slug=slug, task_id=task_id)
     else:
         f_time = AddTimeToTaskForm(initial={'task': task}, prefix='time')
+        pprint(Developer.objects.get(user__username=request.user))
+        pprint(User.objects.get(username=request.user))
+        author = Developer.objects.get(user=request.user) or User.objects.get(user=request.user)
         f_comment = AddCommentToTaskForm(
-            initial={'task': task, 'author': Developer.objects.get(user=request.user)}, prefix='comment')
+            initial={'task': task, 'author': author}, prefix='comment')
 
     args = {'project': project, 'task': task, 'f_time': f_time, 'spent_time': spent_time,
             'f_comment': f_comment, 'time_list': time, 'comments': comments}
