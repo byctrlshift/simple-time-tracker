@@ -11,5 +11,5 @@ urlpatterns = [
     path('user/register/step-1/', views.register_step_1, name='register-step-1'),
     path('user/register/step-2/<int:user_id>', views.register_step_2, name='register-step-2'),
     path('users/', views.user_list, name='user-list'),
-    path('profile/', views.profile, name='user-profile'),
+    # path('profile/', views.profile, name='user-profile'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

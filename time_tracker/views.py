@@ -134,7 +134,7 @@ def edit_project(request, slug):
     else:
         form = ProjectForm(instance=project)
 
-    return render(request, 'tracker/project/edit_project.html', {'form': form})
+    return render(request, 'tracker/project/edit_project.html', {'form': form, 'project': project})
 
 
 @user_passes_test(lambda u: u.is_superuser, login_url='/')

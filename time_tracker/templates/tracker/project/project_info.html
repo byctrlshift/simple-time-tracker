@@ -1,48 +1,88 @@
-{% extends 'base.html' %}
+{% extends 'tracker/tracker_home.html' %}
 
 {% block title %}{{ project.name }}{% endblock %}
 
+{% block brdc-links %}
+    <li class="breadcrumb-item"><a href="{% url 'homepage' %}">Home</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'tracker-home' %}">Tracker</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{ project.name }}</li>
+{% endblock %}
+
 {% block content %}
-    <div class="jumbotron">
-        <h1 class="display-4">Hello, it is {{ project.name }} <b>project</b>!</h1>
-        <p class="lead">{{ project.description|safe }}</p>
-        <hr class="my-4">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{% url 'tracker-home' %}">Home</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Project {{ project.name }}</li>
-            </ol>
-        </nav>
+    <h1 class="h2">{{ project.name }}</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group mr-2">
+            {% if user.is_superuser %}
+                <a href="{% url 'project-edit' slug=project.slug %}" class="btn btn-sm btn-outline-secondary">Edit
+                    project</a>
+                <a href="{% url 'task-create' slug=project.slug %}" class="btn btn-sm btn-outline-secondary">Add
+                    task</a>
+            {% endif %}
+            <a href="{% url 'tracker-home' %}" class="btn btn-sm btn-outline-secondary">Go back to tracker</a>
+        </div>
+    </div>
+    <div class="card" style="border: none;">
+        <div class="card-body">
+            <h5 class="card-title">Spent time for all tasks</h5>
+            <p class="card-text"> Now: {{ hours }} hours</p>
+            <p class="card-text"> Preliminarily: {{ caclTime }} hours</p>
+        </div>
+    </div>
     </div>
     <div class="row">
-        <div class="col-md-9">
-            <div class="list-group">
-                {% for task in tasks %}
-                    <a href="{% url 'task-info' slug=project.slug task_id=task.id %}" class="list-group-item list-group-item-action">
-                        <div class="d-flex w-100 justify-content-between">
-                            <h5 class="mb-1">{{ task.subject }}</h5>
-                            <small>From {{ task.date_start|date:'Y-m-d'}} to {{ task.date_stop|date:'Y-m-d' }} <br> Hours: {{ task.hours }}</small>
-                        </div>
-                        <p class="mb-1">{{ task.description|truncatechars:32|safe }}</p>
-                        <small>Type: <b>{{ task.get_kind_display }}</b> Priority: <b>{{ task.get_priority_display }}</b></small><br>
-                        <small>Creator: <b>{{ task.creator }}</b> Implementor: <b>{{ task.implementer.user.username }}</b></small>
-                    </a>
-                {% endfor %}
-            </div>
-        </div>
-        <div class="col-md-3">
-            {% if user.is_superuser %}
-                <a href="{% url 'project-edit' slug=project.slug %}" class="btn btn-primary btn-lg btn-block">Edit project</a>
-                <a href="{% url 'task-create' slug=project.slug %}" class="btn btn-primary btn-lg btn-block">Add Task</a>
-                <br>
-            {% endif %}
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Spent time for all tasks</h5>
-                    <p class="card-text"> Now: {{ hours }} hours</p>
-                    <p class="card-text"> Preliminarily: {{ caclTime }} hours</p>
+        <div class="card flex-md-row mb-4 box-shadow h-md-250">
+            {% for task in tasks %}
+                <div class="card-body d-flex flex-column align-items-start">
+                    <strong class="d-inline-block mb-2 text-primary">{{ task.get_kind_display }}</strong>
+                    <h3 class="mb-0">
+                        <a class="text-dark"
+                           href="{% url 'task-info' slug=project.slug task_id=task.id %}">{{ task.subject }}</a>
+                    </h3><br>
+                    <div class="mb-1 text-muted">{{ task.date_start|date:'Y-m-d' }}
+                        to {{ task.date_stop|date:'Y-m-d' }}</div>
+                    <p class="card-text mb-auto">{{ task.description|striptags|truncatechars:32 }}</p><br>
+                    <p class="card-text mb-auto">Creator: <b>{{ task.creator }}</b><br>
+                        Implementor: <b>{{ task.implementer.user.username }}</b>
+                    </p><br>
+                    <a href="{% url 'task-info' slug=project.slug task_id=task.id %}">More</a>
                 </div>
-            </div>
+            {% endfor %}
         </div>
     </div>
+    {#    <div class="col-md-9">#}
+    {#        <div class="list-group">#}
+    {#            {% for task in tasks %}#}
+    {#                <a href="{% url 'task-info' slug=project.slug task_id=task.id %}"#}
+    {#                   class="list-group-item list-group-item-action">#}
+    {#                    <div class="d-flex w-100 justify-content-between">#}
+    {#                        <h5 class="mb-1">{{ task.subject }}</h5>#}
+    {#                        <small>From {{ task.date_start|date:'Y-m-d' }} to {{ task.date_stop|date:'Y-m-d' }} <br>#}
+    {#                            Hours: {{ task.hours }}</small>#}
+    {#                    </div>#}
+    {#                    <p class="mb-1">{{ task.description|truncatechars:32|safe }}</p>#}
+    {#                    <small>Type: <b>{{ task.get_kind_display }}</b> Priority:#}
+    {#                        <b>{{ task.get_priority_display }}</b></small><br>#}
+    {#                    <small>Creator: <b>{{ task.creator }}</b> Implementor:#}
+    {#                        <b>{{ task.implementer.user.username }}</b></small>#}
+    {#                </a>#}
+    {#            {% endfor %}#}
+    {#        </div>#}
+    {#    </div>#}
+    {#    <div class="col-md-3">#}
+    {#        {% if user.is_superuser %}#}
+    {#            <a href="{% url 'project-edit' slug=project.slug %}" class="btn btn-primary btn-lg btn-block">Edit#}
+    {#                project</a>#}
+    {#            <a href="{% url 'task-create' slug=project.slug %}" class="btn btn-primary btn-lg btn-block">Add#}
+    {#                Task</a>#}
+    {#            <br>#}
+    {#        {% endif %}#}
+    {#        <div class="card">#}
+    {#            <div class="card-body">#}
+    {#                <h5 class="card-title">Spent time for all tasks</h5>#}
+    {#                <p class="card-text"> Now: {{ hours }} hours</p>#}
+    {#                <p class="card-text"> Preliminarily: {{ caclTime }} hours</p>#}
+    {#            </div>#}
+    {#        </div>#}
+    {#    </div>#}
+    {#    </div>#}
 {% endblock %}

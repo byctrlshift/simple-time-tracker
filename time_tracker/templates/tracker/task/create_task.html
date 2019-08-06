@@ -1,16 +1,23 @@
-{% extends 'base.html' %}
+{% extends 'tracker/tracker_home.html' %}
+
 {% load widget_tweaks %}
 {% load static %}
 
 {% block title %}Create task for {{ project.name }} project{% endblock %}
+
+{% block brdc-links %}
+    <li class="breadcrumb-item"><a href="{% url 'homepage' %}">Home</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'tracker-home' %}">Tracker</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Create task for {{ project.name }} project</li>
+{% endblock %}
+
 {% block add_to_head %}
     <script type="text/javascript" src="{% static "tiny_mce/tiny_mce.js" %}"></script>
     {{ form.media }}
 {% endblock %}
 
 {% block content %}
-    <div class="py-5 text-center">
-        <h2>Create task for {{ project.name }} project</h2>
+    <h1 class="h2">Create task</h1>
     </div>
     {% if form.errors %}
         {% for field in form %}
@@ -82,7 +89,7 @@
                     </div>
                 </div>
                 <br>
-                <button class="btn btn-primary btn-lg btn-block" type="submit">Submit</button>
+                <button class="btn btn-secondary btn-lg btn-block" type="submit">Submit</button>
             </form>
         </div>
     </div>

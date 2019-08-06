@@ -60,12 +60,12 @@ def user_list(request):
     return render(request, 'list/index.html', {'users': users})
 
 
-def profile(request):
-    if request.user.is_superuser:
-        projects = Project.objects.all()
-    else:
-        dev = Developer.objects.get(user__username=request.user.username)
-        projects_id = Task.objects.filter(implementer=dev).all()
-        projects = Project.objects.filter(pk__in=[x.project.pk for x in projects_id])
-
-    return render(request, 'profile/index.html', {'projects': projects})
+# def profile(request):
+#     if request.user.is_superuser:
+#         projects = Project.objects.all()
+#     else:
+#         dev = Developer.objects.get(user__username=request.user.username)
+#         projects_id = Task.objects.filter(implementer=dev).all()
+#         projects = Project.objects.filter(pk__in=[x.project.pk for x in projects_id])
+#
+#     return render(request, 'profile/index.html', {'projects': projects})

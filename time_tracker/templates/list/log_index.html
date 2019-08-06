@@ -1,40 +1,47 @@
-{% extends 'base.html' %}
+{% extends 'tracker/tracker_home.html' %}
 
-{% block title %}Time log list{% endblock %}
+{% block title %}Time log{% endblock %}
+
+{% block brdc-links %}
+    <li class="breadcrumb-item"><a href="{% url 'homepage' %}">Home</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'tracker-home' %}">Tracker</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Time log</li>
+{% endblock %}
 
 {% block content %}
-    <div class="py-5 text-center">
-        <h2>Time log list</h2>
+    <h1 class="h2">Time log</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group mr-2">
+            <a href="{% url 'tracker-home' %}" class="btn btn-sm btn-outline-secondary">Go back to tracker</a>
+        </div>
     </div>
-    <div class="row">
-        <div class="col-md-9">
-            <table class="table table-striped">
-                <thead>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-striped table-sm">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Username</th>
+                <th>Project</th>
+                <th>Task</th>
+                <th>Comment</th>
+                <th>Hours</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for log in logs %}
                 <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Username</th>
-                    <th scope="col">Project</th>
-                    <th scope="col">Task</th>
-                    <th scope="col">Comment</th>
-                    <th scope="col">Hours</th>
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td>{{ log.user }}</td>
+                    <td><a href="{% url 'project-info' slug=log.task.project.slug %}">{{ log.task.project }}</a></td>
+                    <td>
+                        <a href="{% url 'task-info' slug=log.task.project.slug task_id=log.task.pk %}">{{ log.task }}</a>
+                    </td>
+                    <td>{{ log.comment }}</td>
+                    <td>{{ log.hours }}</td>
                 </tr>
-                </thead>
-                <tbody>
-                {% for log in logs %}
-                    <tr>
-                        <th scope="row">{{ forloop.counter }}</th>
-                        <td>{{ log.user }}</td>
-                        <td><a href="{% url 'project-info' slug=log.task.project.slug %}">{{ log.task.project }}</a> </td>
-                        <td><a href="{% url 'task-info' slug=log.task.project.slug task_id=log.task.pk %}">{{ log.task }}</a></td>
-                        <td>{{ log.comment }}</td>
-                        <td>{{ log.hours }}</td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        <div class="col-md-3">
-            <a href="{% url 'tracker-home' %}" class="btn btn-secondary">Go to tracker</a>
-        </div>
+            {% endfor %}
+            </tbody>
+        </table>
     </div>
 {% endblock %}
