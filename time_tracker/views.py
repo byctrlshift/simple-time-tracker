@@ -16,7 +16,7 @@ from time_tracker.forms import CreateTaskForm, EditTaskForm, AddTimeToTaskForm, 
 def task_send_message(instance, sender, **kwargs):
     try: 
         old = sender.objects.get(pk=instance.pk)
-    exept sender.DoesNotExist:
+    except sender.DoesNotExist:
         pass
     else:
         html = get_template('email/email.html')
