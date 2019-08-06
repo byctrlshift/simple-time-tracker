@@ -3,7 +3,7 @@
 .DS_Store
 .idea
 #*/migrations
-static
+#static
 
 __pycache__/
 *.py[cod]
