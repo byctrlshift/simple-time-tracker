@@ -2,7 +2,7 @@
 
 .DS_Store
 .idea
-*/migrations
+#*/migrations
 static
 
 __pycache__/
