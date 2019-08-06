@@ -48,7 +48,7 @@ class Task(models.Model):
         ('B', 'Bug'),
     )
     subject = models.CharField(max_length=128)
-    description = models.TextField()
+    description = tinymce_models.HTMLField()
     date_start = models.DateField()
     date_stop = models.DateField()
     kind = models.CharField(max_length=1, choices=TASK_TYPE, default='F')
