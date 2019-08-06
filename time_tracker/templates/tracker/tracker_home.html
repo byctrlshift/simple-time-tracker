@@ -29,6 +29,7 @@
         <div class="col-md-3">
             {% if user.is_superuser %}
                 <a href="{% url 'project-create' %}" class="btn btn-primary btn-lg btn-block">Create project</a>
+                <a href="{% url 'time-log-list' %}" class="btn btn-primary btn-lg btn-block">Time log list</a>
                 <a href="{% url 'accounts:register-step-1' %}" class="btn btn-primary btn-lg btn-block">Registration new developer</a>
             {% endif %}
         </div>

@@ -60,13 +60,6 @@ def user_list(request):
     return render(request, 'list/index.html', {'users': users})
 
 
-@user_passes_test(lambda u: u.is_superuser, login_url='/')
-def time_log_list(request):
-    logs = Log.objects.all()
-
-    return render(request, 'list/log_index.html', {'logs': logs})
-
-
 def profile(request):
     if request.user.is_superuser:
         projects = Project.objects.all()

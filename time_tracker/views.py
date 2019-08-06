@@ -32,6 +32,13 @@ def home(request):
     return render(request, 'index.html')
 
 
+@user_passes_test(lambda u: u.is_superuser, login_url='/')
+def time_log_list(request):
+    logs = Log.objects.all()
+
+    return render(request, 'list/log_index.html', {'logs': logs})
+
+
 def tracker_home(request):
     if request.user.is_superuser:
         projects = Project.objects.all()
