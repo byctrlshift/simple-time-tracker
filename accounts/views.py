@@ -1,5 +1,5 @@
 from django.contrib import auth
-from time_tracker.models import Developer
+from time_tracker.models import Developer, Log, Project, Task
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import user_passes_test
@@ -58,3 +58,21 @@ def register_step_2(request, user_id):
 def user_list(request):
     users = Developer.objects.all()
     return render(request, 'list/index.html', {'users': users})
+
+
+@user_passes_test(lambda u: u.is_superuser, login_url='/')
+def time_log_list(request):
+    logs = Log.objects.all()
+
+    return render(request, 'list/log_index.html', {'logs': logs})
+
+
+def profile(request):
+    if request.user.is_superuser:
+        projects = Project.objects.all()
+    else:
+        dev = Developer.objects.get(user__username=request.user.username)
+        projects_id = Task.objects.filter(implementer=dev).all()
+        projects = Project.objects.filter(pk__in=[x.project.pk for x in projects_id])
+
+    return render(request, 'profile/index.html', {'projects': projects})

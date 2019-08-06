@@ -73,3 +73,4 @@ class Log(models.Model):
     hours = models.FloatField()
     comment = models.TextField()
     task = models.ForeignKey(Task, null=True, on_delete=models.SET_NULL)
+    user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)

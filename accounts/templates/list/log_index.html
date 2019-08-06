@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Time log list{% endblock %}
+
+{% block content %}
+    <div class="py-5 text-center">
+        <h2>Time log list</h2>
+    </div>
+    <div class="row">
+        <div class="col-md-9">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Username</th>
+                    <th scope="col">Project</th>
+                    <th scope="col">Task</th>
+                    <th scope="col">Comment/th>
+                    <th scope="col">Hours</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for log in logs %}
+                    <tr>
+                        <th scope="row">{{ forloop.counter }}</th>
+                        <td>{{ log.user }}</td>
+                        <td><a href="{% url 'project-info' slug=log.task.project.slug %}">{{ log.task.project }}</a> </td>
+                        <td><a href="{% url 'task-info' slug=log.task.project.slug task_id=log.task.pk %}">{{ log.task }}</a></td>
+                        <td>{{ log.comment }}</td>
+                        <td>{{ log.hours }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-3">
+            <a href="{% url 'tracker-home' %}" class="btn btn-secondary">Go to tracker</a>
+        </div>
+    </div>
+{% endblock %}
