@@ -12,17 +12,17 @@ from time_tracker.models import Project, Task, Log, Developer, Comment
 from time_tracker.forms import CreateTaskForm, EditTaskForm, AddTimeToTaskForm, AddCommentToTaskForm, ProjectForm
 
 
-# @receiver(pre_save, sender=Task)
-# def task_send_message(instance, sender):
-#     html = get_template('email.html')
-#     d = {'old': Task.objects.get(pk=instance.pk), 'new': instance}
-#
-#     subject, from_email, to = 'hello', 'from@example.com', 'to@example.com'
-#     html_content = html.render(d)
-#     msg = EmailMultiAlternatives(subject, "text_content", from_email, [to])
-#     msg.attach_alternative(html_content, "text/html")
-#     msg.send()
-#
+@receiver(pre_save, sender=Task)
+def task_send_message(instance, sender):
+    html = get_template('email.html')
+    d = {'old': Task.objects.get(pk=instance.pk), 'new': instance}
+
+    subject, from_email, to = 'hello', 'from@example.com', 'to@example.com'
+    html_content = html.render(d)
+    msg = EmailMultiAlternatives(subject, "text_content", from_email, [to])
+    msg.attach_alternative(html_content, "text/html")
+    msg.send()
+
 
 def home(request):
     return render(request, 'index.html')
