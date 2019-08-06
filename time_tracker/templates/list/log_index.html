@@ -33,10 +33,20 @@
                 <tr>
                     <th scope="row">{{ forloop.counter }}</th>
                     <td>{{ log.user }}</td>
-                    <td><a href="{% url 'project-info' slug=log.task.project.slug %}">{{ log.task.project }}</a></td>
-                    <td>
-                        <a href="{% url 'task-info' slug=log.task.project.slug task_id=log.task.pk %}">{{ log.task }}</a>
-                    </td>
+                    {% if user.is_superuser %}
+                        <td>
+                            <a href="{% url 'project-info' slug=log.task.project.slug %}">{{ log.task.project }}</a>
+                        </td>
+                    {% else %}
+                        <td>{{ log.task.project }}</td>
+                    {% endif %}
+                    {% if user.is_superuser %}
+                        <td>
+                            <a href="{% url 'task-info' slug=log.task.project.slug task_id=log.task.pk %}">{{ log.task }}</a>
+                        </td>
+                    {% else %}
+                        <td>{{ log.task }}</td>
+                    {% endif %}
                     <td>{{ log.comment }}</td>
                     <td>{{ log.hours }}</td>
                 </tr>
