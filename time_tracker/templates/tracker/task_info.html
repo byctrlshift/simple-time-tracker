@@ -111,7 +111,7 @@
                                 <small>{{ comment.createdAt|date:"d-m-Y" }} {{ comment.createdAt|time:"H:i" }}</small>
                             </div>
                             <p class="mb-1">{{ comment.comment|safe }}</p>
-                            <small>Author: <b>{{ comment.author.user.username }}</b></small>
+                            <small>Author: <b>{{ comment.author.user }}</b></small>
                         </a>
                     {% endfor %}
                 </div>
