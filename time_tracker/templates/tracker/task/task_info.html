@@ -46,6 +46,7 @@
                             {{ hidden_field }}
                         {% endfor %}
                         {% render_field f_time.task hidden=hidden %}
+                        {% render_field f_time.user hidden=hidden %}
                         <div class="form-group">
                             <label for="{{ f_time.hours.id_for_label }}">Hours</label>
                             {{ f_time.hours|add_class:"form-control" }}
