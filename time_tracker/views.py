@@ -13,7 +13,7 @@ from time_tracker.forms import CreateTaskForm, EditTaskForm, AddTimeToTaskForm, 
 
 
 @receiver(pre_save, sender=Task)
-def task_send_message(instance, sender):
+def task_send_message(instance, sender, **kwargs):
     html = get_template('email.html')
     d = {'old': Task.objects.get(pk=instance.pk), 'new': instance}
 
