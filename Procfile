@@ -1,1 +1,1 @@
-web: gunicorn codevog_test.wsgi --log-file -
+web: gunicorn ttr.wsgi --log-file -

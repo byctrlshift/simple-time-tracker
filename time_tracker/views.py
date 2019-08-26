@@ -1,12 +1,15 @@
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.dispatch import receiver
+from django.urls import reverse_lazy
+from django.contrib.auth.models import User
 from django.db.models.signals import pre_save
-from django.shortcuts import render, redirect
 from django.template.loader import get_template
 from django.core.mail import EmailMultiAlternatives
+from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import user_passes_test
+from django.shortcuts import render, redirect, get_object_or_404
 from time_tracker.models import Project, Task, Log, Developer, Comment
+from django.views.generic import View, TemplateView, ListView, CreateView, DetailView, UpdateView
 from time_tracker.forms import CreateTaskForm, EditTaskForm, AddTimeToTaskForm, AddCommentToTaskForm, ProjectForm
 
 
@@ -28,123 +31,142 @@ def task_send_message(instance, sender, **kwargs):
         msg.send()
 
 
-def home(request):
-    return render(request, 'index.html')
+class HomeView(TemplateView):
+    template_name = 'index.html'
 
 
-def time_log_list(request):
-    logs = Log.objects.all()
-
-    return render(request, 'list/log_index.html', {'logs': logs})
-
-
-def tracker_home(request):
-    if request.user.is_superuser:
-        projects = Project.objects.all()
-    else:
-        dev = Developer.objects.get(user__username=request.user.username)
-        projects_id = Task.objects.filter(implementer=dev).all()
-        projects = Project.objects.filter(pk__in=[x.project.pk for x in projects_id])
-
-    return render(request, 'tracker/tracker_home.html', {'projects': projects})
+class TimeLogListView(ListView):
+    model = Log
+    template_name = 'list/log_index.html'
+    context_object_name = 'logs'
 
 
-def project_info(request, slug):
-    project = Project.objects.get(slug=slug)
-    tasks = Task.objects.filter(project=project)
+class TrackerHomeView(View):
+
+    def get(self, request, *args, **kwargs):
+        if request.user.is_superuser:
+            projects = Project.objects.all()
+        else:
+            dev = Developer.objects.get(user__username=request.user.username)
+            projects_id = Task.objects.filter(implementer=dev).all()
+            projects = Project.objects.filter(pk__in=[x.project.pk for x in projects_id])
+
+        return render(request, 'tracker/tracker_home.html', {'projects': projects})
+
+
+class ProjectDetailView(DetailView):
+    model = Project
+    template_name = 'tracker/project/project_info.html'
+    context_object_name = 'project'
     calc_time = time = 0
 
-    for task in tasks:
-        calc_time += task.hours
-        for l in Log.objects.filter(task_id=task.id):
-            time += float(l.hours)
+    def set_time(self, tasks):
+        for task in tasks:
+            self.calc_time += task.hours
+            for l in Log.objects.filter(task_id=task.id):
+                self.time += float(l.hours)
 
-    args = {'project': project, 'tasks': tasks, 'hours': time, 'caclTime': calc_time}
-    return render(request, 'tracker/project/project_info.html', args)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        tasks = Task.objects.filter(project__slug=self.object.slug)
+        self.set_time(tasks)
+        context['tasks'] = tasks
+        context['hours'] = self.time
+        context['caclTime'] = self.calc_time
+        return context
 
 
-def task_info(request, slug, task_id):
-    project = Project.objects.get(slug=slug)
-    task = Task.objects.get(id=task_id)
-    time = Log.objects.filter(task_id=task_id)
-    comments = Comment.objects.filter(task_id=task_id).order_by('-createdAt')
-    spent_time = 0
-    for t in time:
-        spent_time += t.hours
+class TaskDetailView(DetailView):
+    model = Task
+    template_name = 'tracker/task/task_info.html'
 
-    if request.POST:
+    def get_object(self, queryset=None):
+        return get_object_or_404(Task, id=self.kwargs.get('task_id'))
+
+    def post(self, request, *args, **kwargs):
         f_time = AddTimeToTaskForm(request.POST, prefix='time')
         f_comment = AddCommentToTaskForm(request.POST, prefix='comment')
+
         if f_time.is_valid():
             f_time.save()
+            return redirect('task-info', slug=self.kwargs.get('slug'), task_id=self.kwargs.get('task_id'))
+
         if f_comment.is_valid():
             f_comment.save()
+            return redirect('task-info', slug=self.kwargs.get('slug'), task_id=self.kwargs.get('task_id'))
 
-        return redirect('task-info', slug=slug, task_id=task_id)
-    else:
-        f_time = AddTimeToTaskForm(initial={'task': task, 'user': User.objects.get(username=request.user)}, prefix='time')
-        f_comment = AddCommentToTaskForm(
-            initial={'task': task, 'author': User.objects.get(username=request.user)}, prefix='comment')
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        spent_time = 0
+        project = Project.objects.get(slug=self.kwargs.get('slug'))
+        comments = Comment.objects.filter(task_id=self.kwargs.get('task_id')).order_by('-createdAt')
+        time = Log.objects.filter(task_id=self.kwargs.get('task_id'))
+        for t in time:
+            spent_time += t.hours
 
-    args = {'project': project, 'task': task, 'f_time': f_time, 'spent_time': spent_time,
-            'f_comment': f_comment, 'time_list': time, 'comments': comments}
+        context['f_time'] = AddTimeToTaskForm(
+            initial={'task': self.get_object(), 'user': User.objects.get(username=self.request.user)},
+            prefix='time')
+        context['f_comment'] = AddCommentToTaskForm(
+            initial={'task': self.get_object(), 'author': User.objects.get(username=self.request.user)},
+            prefix='comment')
+        context['project'] = project
+        context['comments'] = comments
+        context['time_list'] = time
+        context['spent_time'] = spent_time
 
-    return render(request, 'tracker/task/task_info.html', args)
-
-
-def edit_task(request, slug, task_id):
-    project = Project.objects.get(slug=slug)
-    task = Task.objects.get(id=task_id)
-
-    if request.POST:
-        form = EditTaskForm(request.POST, instance=task)
-        if form.is_valid():
-            new = form.save()
-            # task_send_message(task, new)
-            return redirect('task-info', slug=slug, task_id=task_id)
-    else:
-        form = EditTaskForm(instance=task)
-
-    args = {'form': form, 'project': project, 'task': task}
-    return render(request, 'tracker/task/edit_task_info.html', args)
+        return context
 
 
-@user_passes_test(lambda u: u.is_superuser, login_url='/')
-def create_project(request):
-    if request.POST:
-        form = ProjectForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('tracker-home')
-    else:
-        form = ProjectForm()
+class TaskUpdateView(UpdateView):
+    model = Task
+    template_name = 'tracker/task/edit_task_info.html'
+    form_class = EditTaskForm
 
-    return render(request, 'tracker/project/create_project.html', {'form': form})
+    def get_object(self, queryset=None):
+        return get_object_or_404(Task, id=self.kwargs.get('task_id'))
 
-
-@user_passes_test(lambda u: u.is_superuser, login_url='/')
-def edit_project(request, slug):
-    project = Project.objects.get(slug=slug)
-    if request.POST:
-        form = ProjectForm(request.POST, instance=project)
-        if form.is_valid():
-            new = form.save()
-            return redirect('project-info', slug=new.slug)
-    else:
-        form = ProjectForm(instance=project)
-
-    return render(request, 'tracker/project/edit_project.html', {'form': form, 'project': project})
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['project'] = Project.objects.get(slug=self.kwargs.get('slug'))
+        return context
 
 
-@user_passes_test(lambda u: u.is_superuser, login_url='/')
-def create_task(request, slug):
-    project = Project.objects.get(slug=slug)
-    if request.POST:
-        form = CreateTaskForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('tracker-home')
-    else:
-        form = CreateTaskForm(initial={'project': project, 'creator': request.user})
+class ProjectCreateView(CreateView):
+    model = Project
+    form_class = ProjectForm
+    template_name = 'tracker/project/create_project.html'
+    success_url = reverse_lazy('tracker-home')
 
-    return render(request, 'tracker/task/create_task.html', {'form': form, 'project': project})
+    @method_decorator(user_passes_test(lambda u: u.is_superuser))
+    def dispatch(self, *args, **kwargs):
+        return super(ProjectCreateView, self).dispatch(*args, **kwargs)
+
+
+class ProjectUpdateView(UpdateView):
+    model = Project
+    form_class = ProjectForm
+    template_name = 'tracker/project/edit_project.html'
+    success_url = reverse_lazy('tracker-home')
+
+    def get_object(self, queryset=None):
+        return get_object_or_404(Project, slug=self.kwargs.get('slug'))
+
+    @method_decorator(user_passes_test(lambda u: u.is_superuser))
+    def dispatch(self, *args, **kwargs):
+        return super(ProjectUpdateView, self).dispatch(*args, **kwargs)
+
+
+class TaskCreateView(CreateView):
+    model = Task
+    form_class = CreateTaskForm
+    template_name = 'tracker/task/create_task.html'
+    success_url = reverse_lazy('tracker-home')
+
+    def get_initial(self):
+        project = Project.objects.get(slug=self.kwargs.get('slug'))
+        return {'project': project, 'creator': self.request.user}
+
+    @method_decorator(user_passes_test(lambda u: u.is_superuser))
+    def dispatch(self, *args, **kwargs):
+        return super(TaskCreateView, self).dispatch(*args, **kwargs)

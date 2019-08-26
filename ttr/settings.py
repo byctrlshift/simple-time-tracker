@@ -21,8 +21,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# SECRET_KEY = '-oc)@g3_0om6=c*&m#=k^%6*vdn-b&_&j0g-qd-d9m7&usy_xk'
-SECRET_KEY = config('SECRET_KEY')
+SECRET_KEY = '-oc)@g3_0om6=c*&m#=k^%6*vdn-b&_&j0g-qd-d9m7&usy_xk'
+# SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = True
@@ -62,7 +62,7 @@ MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
-ROOT_URLCONF = 'codevog_test.urls'
+ROOT_URLCONF = 'ttr.urls'
 
 TEMPLATES = [
     {
@@ -83,26 +83,26 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'codevog_test.wsgi.application'
+WSGI_APPLICATION = 'ttr.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
 DATABASES = {
-    'default': dj_database_url.config(
-        default=config('DATABASE_URL')
-    )
+    # 'default': dj_database_url.config(
+    #     default=config('DATABASE_URL')
+    # )
     # 'ENGINE': 'django.db.backends.sqlite3',
     #     'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
 
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.mysql',
-    #     'NAME': 'time_tracker',
-    #     'USER': 'root',
-    #     'PASSWORD': '',
-    #     'HOST': '127.0.0.1',  # Or an IP Address that your DB is hosted on
-    #     'PORT': '3306',
-    # }
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'time_tracker',
+        'USER': 'root',
+        'PASSWORD': '',
+        'HOST': '127.0.0.1',  # Or an IP Address that your DB is hosted on
+        'PORT': '3306',
+    }
 }
 
 # Password validation
@@ -155,7 +155,7 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'dmkshift@gmail.com'
-EMAIL_HOST_PASSWORD = config('SMTP_PASS')
+# EMAIL_HOST_PASSWORD = config('SMTP_PASS')
 
 TINYMCE_DEFAULT_CONFIG = {
     'plugins': "table,spellchecker,paste,searchreplace",
